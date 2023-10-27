@@ -1,0 +1,47 @@
+<!-- book_list.html -->
+<table class="table table-striped caption-top">
+    <thead class="thead-light">
+        <tr>
+            <th>
+                {% if is_home %}
+                    <a href="{% url 'home' 'title' %}">Title</a>
+                {% else %}
+                    Title
+                {% endif %}
+            </th>
+            <th>
+                {% if is_home %}
+                    <a href="{% url 'home' 'author' %}">Author</a>
+                {% else %}
+                    Author
+                {% endif %}
+            </th>
+            <th>Description</th>
+            <th>Add/Remove</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for book in books %}
+        <tr>
+            <td>{{ book.title }}</td>
+            <td>{{ book.author }}</td>
+            <td>{{ book.description }}</td>
+            <td>
+                {% if book.owned %}
+                    <form method="post" action="{% url 'remove_book' book.title_author %}">
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                {% else %}
+                    <form method="post" action="{% url 'add_book' book.title book.author book.description %}">
+                        <button type="submit" class="btn btn-success">Add</button>
+                    </form>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4" class="text-muted">No books available.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
