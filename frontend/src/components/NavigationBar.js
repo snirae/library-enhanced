@@ -19,7 +19,7 @@ function NavigationBar({props, titleText}) {
                         </Button>
                     </Typography>
 
-                    <Typography variant="h4" component="div" sx={{ flexGrow: 1.3, fontWeight: 500 }}>
+                    <Typography variant="h3" component="div" sx={{ flexGrow: 1.5, fontWeight: 550 }}>
                         {titleText}
                     </Typography>
                 </Toolbar>

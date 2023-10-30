@@ -6,6 +6,7 @@ class Book(models.Model):
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
     description = models.TextField()
+    year = models.IntegerField(null=True)
 
     # date_added = models.DateTimeField(auto_now_add=True)
     # thumbnail = models.ImageField(upload_to='book_thumbnails/', blank=True, null=True)

@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
-import { Typography } from '@mui/material';
 import NavigationBar from './NavigationBar';
 import SearchBar from './SearchBar';
 import BookList from './BookList';
@@ -43,7 +42,11 @@ export default function Home() {
             <br />
             <SearchBar text={searchText} set={setSearchText} submit={handleSubmit} />
             <br />
-            <BookList books={books} isHome={true} />
+            <BookList
+            books={books}
+            isHome={true}
+            searchQuery={searchText}
+            />
         </div>
     );
 }

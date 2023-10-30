@@ -1,4 +1,5 @@
 import requests
+from .models import Book
 
 
 def google_book_info(title):
@@ -11,10 +12,11 @@ def google_book_info(title):
             
             res_dict = {'title': t['title'],
                         'author': t.get('authors', ['Not Available.'])[0],
-                        # 'year': t['publishedDate'][:4],
+                        'year': t['publishedDate'][:4],
                         'description': t.get('description', 'Not Available.'),
-                        'owned': False}
-            res_dict['title_author'] = res_dict['title'] + res_dict['author']
+                        }
+            res_dict['id'] = res_dict['title'] + '-' + res_dict['author']
+            res_dict['owned'] = Book.objects.filter(id=res_dict['id']).exists()
             lst.append(res_dict)
         return lst
     else:

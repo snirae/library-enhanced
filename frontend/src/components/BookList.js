@@ -3,19 +3,20 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 
 
 function SortBooks(books, sortKey) {
-    return books.sort((a, b) => {
-        if (a[sortKey] < b[sortKey]) {
-            return -1;
-        } else if (a[sortKey] > b[sortKey]) {
-            return 1;
-        } else {
-            return 0;
-        }
-    });
+    if (sortKey === 'title' || sortKey === 'author') {
+        books.sort((a, b) => (a[sortKey] > b[sortKey]) ? 1 : -1);
+    }
+    else {
+        books.sort((a, b) => (a[sortKey] < b[sortKey]) ? 1 : -1);
+    }
+
+    return books;
 }
 
 
-const BookList = ({ books, isHome }) => {
+
+
+const BookList = ({ books, isHome, searchQuery }) => {
     const urlParams = new URLSearchParams(window.location.search);
     const sortKey = urlParams.get('sortKey');
     const sortedBooks = sortKey ? SortBooks(books, sortKey) : books;
@@ -28,6 +29,7 @@ const BookList = ({ books, isHome }) => {
                 title: book.title,
                 author: book.author,
                 description: book.description,
+                year: book.year,
             }),
         };
         fetch('/app/create-book', requestOptions)
@@ -37,29 +39,33 @@ const BookList = ({ books, isHome }) => {
         }
         );
 
+        // window.location.href = window.location.href + `?search=${searchQuery}` + `&sortKey=${sortKey}`;
         window.location.reload();
         console.log(`Added: ${book.title}`);
     }
 
     const onRemoveBook = (book) => {
-        const requestOptions = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                title: book.title,
-                author: book.author,
-                description: book.description,
-            }),
-        };
-        fetch('/app/remove-book', requestOptions)
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data);
-        }
-        );
+        if (window.confirm(`Are you sure you want to remove ${book.title}?`)) {
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: book.title,
+                    author: book.author,
+                    description: book.description,
+                }),
+            };
+            fetch('/app/remove-book', requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+            }
+            );
 
-        window.location.reload();
-        console.log(`Removed: ${book.title}`);
+            // window.location.href += `?search=${searchQuery}` + `&sortKey=${sortKey}`;
+            window.location.reload();            
+            console.log(`Removed: ${book.title}`);
+        }
     }
 
     // TODO: change font size of all text in table
@@ -85,15 +91,30 @@ const BookList = ({ books, isHome }) => {
                 )}
                 </TableCell>
                 <TableCell>Description</TableCell>
+                <TableCell>
+                {isHome ? (
+                    <a href="?sortKey=year">Year</a>
+                ) : (
+                    'Year'
+                )}
+                </TableCell>
                 <TableCell>Add/Remove</TableCell>
             </TableRow>
             </TableHead>
             <TableBody>
+                {books.length === 0 && (
+                    <TableRow>
+                        <TableCell colSpan={5} style={{ textAlign: 'center' }}>
+                            No books found
+                        </TableCell>
+                    </TableRow>
+                )}
             {sortedBooks.map((book) => (
                 <TableRow key={book.id}>
                 <TableCell>{book.title}</TableCell>
                 <TableCell>{book.author}</TableCell>
                 <TableCell>{book.description}</TableCell>
+                <TableCell>{book.year}</TableCell>
                 <TableCell>
                     {book.owned ? (
                     <Button
