@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom';
 import Home from './Home';
 import Search from './Search';
+import AddBook from './AddBook';
 
 
 export const router = createBrowserRouter(
@@ -16,6 +17,7 @@ export const router = createBrowserRouter(
         <>
             <Route path="/" element={<Home />} />
             <Route path="/search" element={<Search />} />
+            <Route path='/add-book' element={<AddBook />} />
             {/* <Route path="/app" element={<Navigate to="/app/books" />} /> */}
         </>
     )

@@ -83,3 +83,26 @@ class SearchBookView(APIView):
             search_results = Book.objects.none()
         
         return Response(self.serializer_class(search_results, many=True).data)
+
+
+# app/upload-csv
+class UploadCSVView(APIView):
+    serializer_class = CreateBookSerializer
+
+    def post(self, request, format=None):
+        file = request.FILES['csvFile']
+        if file.name.endswith('.csv'):
+            # read the csv file
+            file_data = file.read().decode('utf-8')
+            lines = file_data.splitlines()
+            for line in lines:
+                if line:
+                    # split the line by comma
+                    title, author, description, year = line.split(',')
+                    # create the book if it doesn't exist
+                    if not Book.objects.filter(title=title, author=author).exists():
+                        book = Book.objects.create(title=title, author=author, description=description, year=year)
+                        book.save()
+            return Response('File uploaded successfully')
+        else:
+            return Response('File format not supported')

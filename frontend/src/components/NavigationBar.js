@@ -17,6 +17,9 @@ function NavigationBar({props, titleText}) {
                         <Button color="inherit" onClick={() => navigate('/search')}>
                             Search
                         </Button>
+                        <Button color="inherit" onClick={() => navigate('/add-book')}>
+                            Add Book
+                        </Button>
                     </Typography>
 
                     <Typography variant="h3" component="div" sx={{ flexGrow: 1.5, fontWeight: 550 }}>

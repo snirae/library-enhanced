@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from '@mui/material';
+import UpdateBookForm from './UpdateBookForm';
 
 
 function SortBooks(books, sortKey) {
@@ -12,8 +13,6 @@ function SortBooks(books, sortKey) {
 
     return books;
 }
-
-
 
 
 const BookList = ({ books, isHome, searchQuery }) => {
@@ -68,77 +67,109 @@ const BookList = ({ books, isHome, searchQuery }) => {
         }
     }
 
+    const [isUpdateFormOpen, setUpdateFormOpen] = useState(false);
+    var selectedBook = null;
+
+    const handleOpenUpdateForm = (book) => {
+        selectedBook = book;
+        console.log(book.title);
+        console.log(selectedBook.title);
+        setUpdateFormOpen(true);
+    };
+
+    const handleCloseUpdateForm = () => {
+        setUpdateFormOpen(false);
+    };
+
     // TODO: change font size of all text in table
     return (
-        <TableContainer component={Paper} style={{ width: '95%', margin: 'auto' }}>
-        <Table>
-            <TableHead style={{ backgroundColor: '#7ABDE6' }}>
-            <TableRow>
-                <TableCell>
-                {isHome ? (
-                    // sort the books that are currently displayed by title
-                    // when the user clicks on the title header
-                    <a href="?sortKey=title">Title</a>
-                ) : (
-                    'Title'
-                )}
-                </TableCell>
-                <TableCell>
-                {isHome ? (
-                    <a href="?sortKey=author">Author</a>
-                ) : (
-                    'Author'
-                )}
-                </TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>
-                {isHome ? (
-                    <a href="?sortKey=year">Year</a>
-                ) : (
-                    'Year'
-                )}
-                </TableCell>
-                <TableCell>Add/Remove</TableCell>
-            </TableRow>
-            </TableHead>
-            <TableBody>
-                {books.length === 0 && (
-                    <TableRow>
-                        <TableCell colSpan={5} style={{ textAlign: 'center' }}>
-                            No books found
-                        </TableCell>
-                    </TableRow>
-                )}
-            {sortedBooks.map((book) => (
-                <TableRow key={book.id}>
-                <TableCell>{book.title}</TableCell>
-                <TableCell>{book.author}</TableCell>
-                <TableCell>{book.description}</TableCell>
-                <TableCell>{book.year}</TableCell>
-                <TableCell>
-                    {book.owned ? (
-                    <Button
-                        variant="contained"
-                        color="error"
-                        onClick={() => onRemoveBook(book)}
-                    >
-                        Remove
-                    </Button>
+        <div>
+            <TableContainer component={Paper} style={{ width: '95%', margin: 'auto' }}>
+            <Table>
+                <TableHead style={{ backgroundColor: '#7ABDE6' }}>
+                <TableRow>
+                    <TableCell>#</TableCell>
+                    <TableCell>
+                    {isHome ? (
+                        <a href="?sortKey=title">Title</a>
                     ) : (
-                    <Button
-                        variant="contained"
-                        color="success"
-                        onClick={() => onAddBook(book)}
-                    >
-                        Add
-                    </Button>
+                        'Title'
                     )}
-                </TableCell>
+                    </TableCell>
+                    <TableCell>
+                    {isHome ? (
+                        <a href="?sortKey=author">Author</a>
+                    ) : (
+                        'Author'
+                    )}
+                    </TableCell>
+                    <TableCell>Description</TableCell>
+                    <TableCell>
+                    {isHome ? (
+                        <a href="?sortKey=year">Year</a>
+                    ) : (
+                        'Year'
+                    )}
+                    </TableCell>
+                    <TableCell>Actions</TableCell>
                 </TableRow>
-            ))}
-            </TableBody>
-        </Table>
-        </TableContainer>
+                </TableHead>
+                <TableBody>
+                    {books.length === 0 && (
+                        <TableRow>
+                            <TableCell colSpan={6} style={{ textAlign: 'center' }}>
+                                No books found
+                            </TableCell>
+                        </TableRow>
+                    )}
+                {sortedBooks.map((book) => (
+                    <TableRow key={book.id}>
+                    <TableCell>{sortedBooks.indexOf(book) + 1}</TableCell>
+                    <TableCell>{book.title}</TableCell>
+                    <TableCell>{book.author}</TableCell>
+                    <TableCell>{book.description}</TableCell>
+                    <TableCell>{book.year}</TableCell>
+                    <TableCell>
+                        {book.owned ? (
+                            <div>
+                                <Button
+                            variant="contained"
+                            color="error"
+                            onClick={() => onRemoveBook(book)}
+                        >
+                            Remove
+                        </Button>
+                        <Button
+                            style={{ marginTop: '10px' }}
+                            variant="contained"
+                            color="info"
+                            onClick={() => handleOpenUpdateForm(book)}
+                        >
+                            Edit
+                        </Button>
+                            </div>
+                        ) : (
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={() => onAddBook(book)}
+                        >
+                            Add
+                        </Button>
+                        )}
+                    </TableCell>
+                    </TableRow>
+                ))}
+                </TableBody>
+            </Table>
+            </TableContainer>
+
+            <UpdateBookForm
+                isOpen={isUpdateFormOpen}
+                onClose={handleCloseUpdateForm}
+                book={selectedBook}
+            />
+        </div>
     );
 };
 

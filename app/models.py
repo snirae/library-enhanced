@@ -5,7 +5,7 @@ class Book(models.Model):
     id = models.CharField(max_length=200, primary_key=True, default="CustomDefaultValue")
     title = models.CharField(max_length=100)
     author = models.CharField(max_length=100)
-    description = models.TextField()
+    description = models.TextField(null=True)
     year = models.IntegerField(null=True)
 
     # date_added = models.DateTimeField(auto_now_add=True)
