@@ -3,13 +3,13 @@ import SearchIcon from "@mui/icons-material/Search";
 
 import '../../static/css/SearchBar.css';
 
-const SearchBar = ({ text, set }) => {
+const SearchBar = ({ text, set, submit }) => {
     const handleChange = (value) => {
         set(value);
     };
 
     const handleSubmit = (value) => {
-        set(value);
+        submit(value);
     };
 
     return (

@@ -1,22 +1,15 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import SearchBar from './SearchBar';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
 
 
-export default class App extends Component {
-    constructor(props) {
-        super(props);
-        };
-
-    render() {
-        return (
-        <div>
-            <SearchBar/>
-        </div>
-        )
-    }
+export default function App() {
+    return (
+        <RouterProvider router={router} />
+    );
 }
+
 
 const appDiv = document.getElementById("app");
 render(<App />, appDiv);
-
