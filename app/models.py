@@ -8,6 +8,8 @@ class Book(models.Model):
     description = models.TextField(null=True)
     year = models.IntegerField(null=True)
 
+    embedding = models.BinaryField(null=True)
+
     # date_added = models.DateTimeField(auto_now_add=True)
     # thumbnail = models.ImageField(upload_to='book_thumbnails/', blank=True, null=True)
 

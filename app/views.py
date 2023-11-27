@@ -1,4 +1,6 @@
+from tkinter import N
 from .models import Book
+from django.db import models
 from rest_framework.response import Response
 from .serializers import BookSerializer, CreateBookSerializer, SearchBookSerializer
 from rest_framework.views import APIView
@@ -6,6 +8,11 @@ from rest_framework import generics
 from django.http import HttpResponse as HTTPResponse
 from .search_books import google_book_info
 
+from .distilbert.embedding_model import EmbeddingModel
+
+
+model = EmbeddingModel()
+embeddings_mean = Book.objects.all().aggregate(models.Avg('embedding'))
 
 # app/books
 class BookView(generics.ListAPIView):
@@ -40,7 +47,14 @@ class CreateBookView(APIView):
                 # update the book
                 book = Book.objects.get(title=title, author=author)
                 book.description = description
+                book.year = year
                 book.save(update_fields=['description', 'year'])
+
+                # update the embedding
+                if description and description.isascii():
+                    book.embedding = model.embed(description).numpy().tobytes()
+                    book.save(update_fields=['embedding'])
+
                 return Response(BookSerializer(book).data)
             else:
                 # create the book
@@ -76,8 +90,12 @@ class SearchBookView(APIView):
         if search_query:
             search_results = google_book_info(search_query)
 
-            # return python dictionary as json
-            return Response(search_results)
+            # add the embeddings
+            for book in search_results:
+                if book['description'] and book['description'].isascii() and embeddings_mean['embedding__avg']:
+                    book['similarity'] = model.similarity(model.embed(book['description']).numpy(), embeddings_mean['embedding__avg'])
+                else:
+                    book['similarity'] = None
         else:
             # empty search results
             search_results = Book.objects.none()
@@ -91,18 +109,31 @@ class UploadCSVView(APIView):
 
     def post(self, request, format=None):
         file = request.FILES['csvFile']
-        if file.name.endswith('.csv'):
-            # read the csv file
-            file_data = file.read().decode('utf-8')
-            lines = file_data.splitlines()
-            for line in lines:
-                if line:
-                    # split the line by comma
-                    title, author, description, year = line.split(',')
-                    # create the book if it doesn't exist
-                    if not Book.objects.filter(title=title, author=author).exists():
-                        book = Book.objects.create(title=title, author=author, description=description, year=year)
-                        book.save()
-            return Response('File uploaded successfully')
-        else:
-            return Response('File format not supported')
+        try:
+            if file.name.endswith('.csv'):
+                # read the csv file
+                file_data = file.read().decode('utf-8')
+                lines = file_data.splitlines()
+                for line in lines:
+                    if line:
+                        # split the line by comma
+                        values = line.split(',')
+                        title = values[0]
+                        author = values[1]
+                        description = values[2] if len(values) > 2 else None
+                        year = values[3] if len(values) > 3 else None                        
+                        # create the book if it doesn't exist
+                        if not Book.objects.filter(title=title, author=author).exists():
+                            book = Book.objects.create(title=title, author=author, description=description, year=year)
+                            book.save()
+                            
+                            # update the embedding
+                            if description and description.isascii():
+                                book.embedding = model.embed(description).numpy().tobytes()
+                                book.save(update_fields=['embedding'])
+
+                return Response('File uploaded successfully')
+            else:
+                return Response('File format not supported')
+        except Exception as e:
+            return Response('Error occurred while uploading file: ' + str(e))

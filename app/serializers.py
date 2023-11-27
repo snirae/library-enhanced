@@ -17,4 +17,4 @@ class CreateBookSerializer(serializers.ModelSerializer):
 class SearchBookSerializer(serializers.Serializer):
     class Meta:
         model = Book
-        fields = ('title', 'author', 'description', 'year', 'owned')
+        fields = ('title', 'author', 'description', 'year', 'owned', 'similarity')

@@ -10,14 +10,13 @@ export default function AddBook() {
         <div>
             <NavigationBar titleText={"ADD BOOK"} />
             <br />
-            {/* place AddBookForm and AddFromFile horizontally */}
             <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <AddBookForm />
                 {/* vertical separation line */}
                 <div
                     style={{
                         borderLeft: "4px royalblue solid",
-                        height: "60%",
+                        height: "80%",
                         position: "absolute",
                         left: "50%",
                     }}

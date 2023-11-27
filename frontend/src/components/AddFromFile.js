@@ -40,7 +40,7 @@ return (
           <Grid item xs={12}>
             <input
               type="file"
-              accept=".csv"
+              accept="text/csv, application/csv"
               id="csv-file-input"
               style={{ display: 'none' }}
               onChange={handleFileChange}

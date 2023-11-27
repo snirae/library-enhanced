@@ -18,12 +18,16 @@ function UpdateBookForm({ isOpen, onClose, book }) {
     };
 
     const onUpdate = (updatedBook) => {
+        // if no changes were made, do nothing
+        if (updatedBook.description === book.description && updatedBook.year === book.year) {
+            return;
+        }
         const requestOptions = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                title: updatedBook.title,
-                author: updatedBook.author,
+                title: book.title,
+                author: book.author,
                 description: updatedBook.description,
                 year: updatedBook.year,
             }),
@@ -54,8 +58,7 @@ function UpdateBookForm({ isOpen, onClose, book }) {
                 disabled
                 label="Title"
                 name="title"
-                value={updatedBook ? updatedBook.title : ''}
-                onChange={handleChange}
+                value={book ? book.title : ''}
                 fullWidth
                 margin="normal"
             />
@@ -63,8 +66,7 @@ function UpdateBookForm({ isOpen, onClose, book }) {
                 disabled
                 label="Author"
                 name="author"
-                value={updatedBook ? updatedBook.author : ''}
-                onChange={handleChange}
+                value={book ? book.author : ''}
                 fullWidth
                 margin="normal"
             />
@@ -73,7 +75,7 @@ function UpdateBookForm({ isOpen, onClose, book }) {
                 name="description"
                 multiline
                 rows={3}
-                value={updatedBook ? updatedBook.description : ''}
+                value={updatedBook ? updatedBook.description : (book ? book.description : '')}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"
@@ -82,7 +84,7 @@ function UpdateBookForm({ isOpen, onClose, book }) {
                 label="Year"
                 type='number'
                 name="year"
-                value={updatedBook ? updatedBook.year : ''}
+                value={updatedBook ? updatedBook.year : (book ? book.year : '')}
                 onChange={handleChange}
                 fullWidth
                 margin="normal"

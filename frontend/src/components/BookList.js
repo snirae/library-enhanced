@@ -68,12 +68,10 @@ const BookList = ({ books, isHome, searchQuery }) => {
     }
 
     const [isUpdateFormOpen, setUpdateFormOpen] = useState(false);
-    var selectedBook = null;
+    const [selectedBook, setSelectedBook] = useState(null);
 
     const handleOpenUpdateForm = (book) => {
-        selectedBook = book;
-        console.log(book.title);
-        console.log(selectedBook.title);
+        setSelectedBook(book);
         setUpdateFormOpen(true);
     };
 
@@ -111,13 +109,20 @@ const BookList = ({ books, isHome, searchQuery }) => {
                         'Year'
                     )}
                     </TableCell>
+                    {!isHome ? (
+                        <TableCell>Similarity</TableCell>
+                    )
+                    : (
+                        null
+                    )}
                     <TableCell>Actions</TableCell>
                 </TableRow>
                 </TableHead>
+
                 <TableBody>
                     {books.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={6} style={{ textAlign: 'center' }}>
+                            <TableCell colSpan={{ isHome } ? 7 : 6} align="center">
                                 No books found
                             </TableCell>
                         </TableRow>
@@ -129,24 +134,30 @@ const BookList = ({ books, isHome, searchQuery }) => {
                     <TableCell>{book.author}</TableCell>
                     <TableCell>{book.description}</TableCell>
                     <TableCell>{book.year}</TableCell>
+                    {!isHome ? (
+                        <TableCell>{book.similarity}</TableCell>
+                    )
+                    : (
+                        null
+                    )}
                     <TableCell>
                         {book.owned ? (
-                            <div>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                                 <Button
-                            variant="contained"
-                            color="error"
-                            onClick={() => onRemoveBook(book)}
-                        >
-                            Remove
-                        </Button>
-                        <Button
-                            style={{ marginTop: '10px' }}
-                            variant="contained"
-                            color="info"
-                            onClick={() => handleOpenUpdateForm(book)}
-                        >
-                            Edit
-                        </Button>
+                                variant="contained"
+                                color="error"
+                                onClick={() => onRemoveBook(book)}
+                                >
+                                    Remove
+                                </Button>
+                                <Button
+                                    style={{ marginTop: '10px' }}
+                                    variant="contained"
+                                    color="info"
+                                    onClick={() => handleOpenUpdateForm(book)}
+                                >
+                                    Edit
+                                </Button>
                             </div>
                         ) : (
                         <Button
