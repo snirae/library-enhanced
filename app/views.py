@@ -100,7 +100,7 @@ class SearchBookView(APIView):
             # empty search results
             search_results = Book.objects.none()
         
-        return Response(self.serializer_class(search_results, many=True).data)
+        return Response(search_results)
 
 
 # app/upload-csv
