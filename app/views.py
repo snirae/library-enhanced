@@ -37,7 +37,13 @@ class CreateBookView(APIView):
 
     def post(self, request, format=None):
         serializer = CreateBookSerializer(data=request.data)
+
         if serializer.is_valid():
+
+            print('\n\n\n')
+            print(serializer.data)
+            print('\n\n\n')
+
             title = serializer.data.get('title')
             author = serializer.data.get('author')
             description = serializer.data.get('description')
@@ -60,6 +66,8 @@ class CreateBookView(APIView):
                 # create the book
                 book = Book.objects.create(title=title, author=author, description=description, year=year)
                 return Response(BookSerializer(book).data)
+        else:
+            print('not valid')
             
 
 # app/remove-book
