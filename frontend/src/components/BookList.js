@@ -29,6 +29,7 @@ const BookList = ({ books, isHome, searchQuery }) => {
                 author: book.author,
                 description: book.description,
                 year: book.year,
+                similarity: book.similarity,
             }),
         };
         fetch('/app/create-book', requestOptions)

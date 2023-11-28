@@ -1,4 +1,4 @@
-from tkinter import N
+from pyrsistent import b
 from .models import Book
 from django.db import models
 from rest_framework.response import Response
@@ -9,10 +9,13 @@ from django.http import HttpResponse as HTTPResponse
 from .search_books import google_book_info
 
 from .distilbert.embedding_model import EmbeddingModel
+import numpy as np
 
 
 model = EmbeddingModel()
-embeddings_mean = Book.objects.all().aggregate(models.Avg('embedding'))
+embeds = np.array([np.frombuffer(book.embedding, dtype=np.float32)
+                    for book in Book.objects.all() if book.embedding])
+embeddings_mean = embeds.mean(axis=0) if embeds.size else None
 
 # app/books
 class BookView(generics.ListAPIView):
@@ -39,11 +42,6 @@ class CreateBookView(APIView):
         serializer = CreateBookSerializer(data=request.data)
 
         if serializer.is_valid():
-
-            print('\n\n\n')
-            print(serializer.data)
-            print('\n\n\n')
-
             title = serializer.data.get('title')
             author = serializer.data.get('author')
             description = serializer.data.get('description')
@@ -55,19 +53,16 @@ class CreateBookView(APIView):
                 book.description = description
                 book.year = year
                 book.save(update_fields=['description', 'year'])
-
-                # update the embedding
-                if description and description.isascii():
-                    book.embedding = model.embed(description).numpy().tobytes()
-                    book.save(update_fields=['embedding'])
-
-                return Response(BookSerializer(book).data)
             else:
                 # create the book
                 book = Book.objects.create(title=title, author=author, description=description, year=year)
-                return Response(BookSerializer(book).data)
-        else:
-            print('not valid')
+            
+            # update the embedding
+            if description and description.isascii():
+                book.embedding = model.embed(description).numpy().tobytes()
+                book.save(update_fields=['embedding'])
+            
+            return Response(BookSerializer(book).data)
             
 
 # app/remove-book
@@ -100,8 +95,10 @@ class SearchBookView(APIView):
 
             # add the embeddings
             for book in search_results:
-                if book['description'] and book['description'].isascii() and embeddings_mean['embedding__avg']:
-                    book['similarity'] = model.similarity(model.embed(book['description']).numpy(), embeddings_mean['embedding__avg'])
+                if book['description'] and book['description'].isascii() and embeddings_mean is not None and book['description'] != 'Not Available.':
+                    book['similarity'] = model.similarity(model.embed(book['description']).numpy(), embeddings_mean)
+                    book['similarity'] = round(book['similarity'] * 100)
+                    book['similarity'] = str(book['similarity']) + '%'
                 else:
                     book['similarity'] = None
         else:
